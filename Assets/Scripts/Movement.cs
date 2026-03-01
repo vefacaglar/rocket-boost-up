@@ -7,15 +7,17 @@ public class Movement : MonoBehaviour
     [SerializeField] InputAction rotate;
     [SerializeField] float thrustStrength = 100f;
     [SerializeField] float rotationStrength = 100f;
+    [SerializeField] float rotationDamp = 5f;
 
     Rigidbody rb;
+    float angularVelocity;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.constraints = RigidbodyConstraints.FreezePositionZ
                        | RigidbodyConstraints.FreezeRotationX
-                       | RigidbodyConstraints.FreezeRotationY;
+                       | RigidbodyConstraints.FreezeRotationZ;
     }
 
     private void OnEnable()
@@ -33,7 +35,12 @@ public class Movement : MonoBehaviour
     private void ProcessRotation()
     {
         float rotationInput = rotate.ReadValue<float>();
-        rb.AddTorque(Vector3.forward * (-rotationInput * rotationStrength * Time.fixedDeltaTime));
+        if (rotationInput != 0)
+            angularVelocity -= rotationInput * rotationStrength * Time.fixedDeltaTime;
+        else
+            angularVelocity = Mathf.Lerp(angularVelocity, 0f, rotationDamp * Time.fixedDeltaTime);
+
+        transform.Rotate(Vector3.forward * (angularVelocity * Time.fixedDeltaTime));
     }
 
     private void ProcessThrusting()
