@@ -9,15 +9,19 @@ public class Movement : MonoBehaviour
     [SerializeField] float rotationStrength = 100f;
     [SerializeField] float rotationDamp = 5f;
     [SerializeField] float maxAngularVelocity = 360f;
+    [SerializeField] float bounciness = 0.4f;
+    [SerializeField] float minBounceSpeed = 1f;
 
     Rigidbody rb;
     float angularVelocity;
+    Vector3 lastVelocity;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.constraints = RigidbodyConstraints.FreezePositionZ
                        | RigidbodyConstraints.FreezeRotationX
+                       | RigidbodyConstraints.FreezeRotationY
                        | RigidbodyConstraints.FreezeRotationZ;
     }
 
@@ -29,6 +33,7 @@ public class Movement : MonoBehaviour
 
     void FixedUpdate()
     {
+        lastVelocity = rb.linearVelocity;
         ProcessThrusting();
         ProcessRotation();
     }
@@ -50,5 +55,15 @@ public class Movement : MonoBehaviour
         {
             rb.AddRelativeForce(Vector3.up * (thrustStrength * Time.fixedDeltaTime));
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        float impactSpeed = collision.relativeVelocity.magnitude;
+        if (impactSpeed < minBounceSpeed) return;
+
+        Vector3 bounceVelocity = Vector3.Reflect(lastVelocity, collision.contacts[0].normal);
+        bounceVelocity.z = 0f;
+        rb.linearVelocity = bounceVelocity * bounciness;
     }
 }
