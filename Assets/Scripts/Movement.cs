@@ -8,6 +8,7 @@ public class Movement : MonoBehaviour
     [SerializeField] float thrustStrength = 100f;
     [SerializeField] float rotationStrength = 100f;
     [SerializeField] float rotationDamp = 5f;
+    [SerializeField] float maxAngularVelocity = 360f;
 
     Rigidbody rb;
     float angularVelocity;
