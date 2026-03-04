@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,11 +12,13 @@ public class Movement : MonoBehaviour
     [SerializeField] float maxAngularVelocity = 360f;
     [SerializeField] float bounciness = 0.4f;
     [SerializeField] float minBounceSpeed = 1f;
+    [SerializeField] float audioFadeOutDuration = 0.3f;
 
     Rigidbody rb;
     float angularVelocity;
     Vector3 lastVelocity;
     AudioSource audioSource;
+    Coroutine fadeOutCoroutine;
 
     void Start()
     {
@@ -59,14 +62,32 @@ public class Movement : MonoBehaviour
 
             if (!audioSource.isPlaying)
             {
+                if (fadeOutCoroutine != null) StopCoroutine(fadeOutCoroutine);
+                audioSource.volume = 1f;
                 audioSource.Play();
             }
-
         }
-        else
+        else if (audioSource.isPlaying && fadeOutCoroutine == null)
         {
-            audioSource.Stop();
+            fadeOutCoroutine = StartCoroutine(FadeOutAudio());
         }
+    }
+
+    private IEnumerator FadeOutAudio()
+    {
+        float startVolume = audioSource.volume;
+        float elapsed = 0f;
+
+        while (elapsed < audioFadeOutDuration)
+        {
+            elapsed += Time.deltaTime;
+            audioSource.volume = Mathf.Lerp(startVolume, 0f, elapsed / audioFadeOutDuration);
+            yield return null;
+        }
+
+        audioSource.Stop();
+        audioSource.volume = 1f;
+        fadeOutCoroutine = null;
     }
 
     private void OnCollisionEnter(Collision collision)
