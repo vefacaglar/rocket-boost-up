@@ -15,10 +15,12 @@ public class Movement : MonoBehaviour
     Rigidbody rb;
     float angularVelocity;
     Vector3 lastVelocity;
+    AudioSource audioSource;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
         rb.constraints = RigidbodyConstraints.FreezePositionZ
                        | RigidbodyConstraints.FreezeRotationX
                        | RigidbodyConstraints.FreezeRotationY
@@ -54,6 +56,16 @@ public class Movement : MonoBehaviour
         if (thrust.ReadValue<float>() > 0)
         {
             rb.AddRelativeForce(Vector3.up * (thrustStrength * Time.fixedDeltaTime));
+
+            if (!audioSource.isPlaying)
+            {
+                audioSource.Play();
+            }
+
+        }
+        else
+        {
+            audioSource.Stop();
         }
     }
 
