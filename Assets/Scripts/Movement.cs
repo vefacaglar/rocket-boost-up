@@ -14,6 +14,8 @@ public class Movement : MonoBehaviour
     [SerializeField] float minBounceSpeed = 1f;
     [SerializeField] float audioFadeOutDuration = 0.3f;
 
+    public bool stopMovement = false;
+
     Rigidbody rb;
     float angularVelocity;
     Vector3 lastVelocity;
@@ -56,7 +58,7 @@ public class Movement : MonoBehaviour
 
     private void ProcessThrusting()
     {
-        if (thrust.ReadValue<float>() > 0)
+        if (thrust.ReadValue<float>() > 0 && !stopMovement)
         {
             rb.AddRelativeForce(Vector3.up * (thrustStrength * Time.fixedDeltaTime));
 
