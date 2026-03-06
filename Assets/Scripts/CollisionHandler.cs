@@ -10,7 +10,7 @@ public class CollisionHandler : MonoBehaviour
             case "Friendly":
                 break;
             case "Finish":
-                LoadNextLevel();
+                StartSuccessSequence();
                 break;
             case "Fuel":
                 break;
@@ -21,6 +21,12 @@ public class CollisionHandler : MonoBehaviour
         }
     }
 
+    void StartSuccessSequence()
+    {
+        DisablePlayerMovement();
+        Invoke("LoadNextLevel", 2f);
+    }
+
     void StartCrashSequence()
     {
 
@@ -29,11 +35,16 @@ public class CollisionHandler : MonoBehaviour
         // play crash particle effect
 
         // disable player movement
-        var playerMovement = GetComponent<Movement>();
-        playerMovement.stopMovement = true;
+        DisablePlayerMovement();
 
         // reload level after delay
         Invoke("ReloadLevel", 2f);
+    }
+
+    void DisablePlayerMovement()
+    {
+        var playerMovement = GetComponent<Movement>();
+        playerMovement.stopMovement = true;
     }
 
     void ReloadLevel()
